@@ -36,7 +36,7 @@ Write every question exactly like this. Separate questions with `---`.
 
 - **Point of view**: the end user, the customer, or the product owner. Not the developer.
 - **Internal decisions** (process, tooling, code structure): still start from a person. Follow the consequence until it reaches someone real: the customer who gets the email twice, the reviewer who stops trusting self-reviews.
-- **Concrete**: named people, named businesses, real numbers, weekdays and times ("Carla renews on Friday at 22:30", "3,000 members, 2,000 inactive for 30+ days").
+- **Concrete**: named people, named businesses, real numbers, weekdays and times ("Lena orders at 23:10 on Thursday", "120 loaves of capacity, 118 already booked").
 - **Show the failure or the friction**: what goes wrong for that person under the wrong choice, or what they gain under the right one. Make the stakes visible without stating them.
 - **No jargon**: function names, tables and flags go in 🔧, not in 📖. Describe behaviour as the person sees it.
 - **Length**: 3–6 sentences.
@@ -57,7 +57,7 @@ Take names, business types and vocabulary from the repo's domain when it has one
 
 ## Recommendation
 
-Name the option, then give a one- or two-sentence reason that points back to the story ("Joana gets her warning on the right day while win-back keeps draining the backlog"). If a recommendation costs something, say what.
+Name the option, then give a one- or two-sentence reason that points back to the story ("Lena sees 'only 2 left' at checkout instead of getting a call from Maya on Saturday morning"). If a recommendation costs something, say what.
 
 ## Collecting answers
 
