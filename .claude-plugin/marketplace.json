@@ -1,0 +1,12 @@
+{
+  "name": "make-a-story-skill",
+  "description": "Skills that turn grilling questions into short stories told from your user's point of view.",
+  "owner": { "name": "victor-lis-bronzo" },
+  "plugins": [
+    {
+      "name": "make-a-story",
+      "source": "./",
+      "description": "Grill-me, but every question comes with a short story told from your user's point of view."
+    }
+  ]
+}

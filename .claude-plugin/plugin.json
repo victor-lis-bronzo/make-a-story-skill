@@ -1,0 +1,10 @@
+{
+  "name": "make-a-story",
+  "version": "0.1.0",
+  "description": "Grill-me, but every question comes with a short story told from your user's point of view.",
+  "author": { "name": "victor-lis-bronzo" },
+  "homepage": "https://github.com/victor-lis-bronzo/make-a-story-skill",
+  "repository": "https://github.com/victor-lis-bronzo/make-a-story-skill",
+  "license": "MIT",
+  "keywords": ["grill", "interview", "story", "planning", "skill"]
+}
