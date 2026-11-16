@@ -6,23 +6,23 @@
 
 ```
 /grill-with-stories docs/plans/reminder-sequences.md
-/grill-with-stories we're adding automated WhatsApp reminders to the studio app
+/grill-with-stories we're adding same-day pickup slots to the bakery app
 /grill-with-stories                 # uses the current conversation as the plan
 ```
 
 ## What a question looks like
 
-> ❓ **Q2 - How do we split the 100/day send cap across sequences?**
+> ❓ **Q2 - What happens when the oven capacity for a day is full?**
 >
-> 📖 **Story:** It's Monday, 7:40. Ana, who owns Studio Bondi, has three sequences live: class reminders for 64 bookings today, a "we miss you" nudge for 52 members who haven't come in 30 days, and a renewal notice for 18 memberships expiring this week. That's 134 messages against a cap of 100. If we send in creation order, the win-back campaign Ana set up last month eats the cap first, and by 9:00 Carla, who booked the 18:00 reformer class, never gets her reminder, misses the class and loses the credit. Ana finds out from Carla at the front desk.
+> 📖 **Story:** It's Friday, 16:20. Maya, who owns Crumb & Co, can bake 120 loaves for Saturday pickup and already has 118 pre-orders. Lena opens the app and orders 4 sourdoughs for her daughter's birthday brunch; the checkout accepts all 4. On Saturday at 07:00 the bakers find they are 2 loaves short, and Maya has to call Lena at 07:30 to say half the order is missing. Lena posts about it in the neighbourhood group by 08:00.
 >
-> 🔧 **Technical context:** `SendQueue.enqueue()` drains messages FIFO by `created_at`; the cap lives in `WHATSAPP_DAILY_LIMIT=100` and is checked per send, with no notion of sequence priority.
+> 🔧 **Technical context:** `place_order()` (`orders/service.py:88`) checks `daily_capacity` before inserting, but reads and writes in separate transactions, and it compares the number of *orders*, not the number of *items*.
 >
-> **Options:** (a) Fixed priority: class reminders first, then renewals, then win-back; anything over the cap rolls to tomorrow. (b) Per-sequence quotas Ana sets herself (e.g. 60/25/15).
+> **Options:** (a) **Reserve capacity per item, atomically.** Lock the day's capacity row, subtract the items, reject with "only 2 left for Saturday" if it would go negative. (b) Allow overbooking by 5% and let the bakery adjust by hand.
 >
-> ➡️ (a). Reminders are time-critical and cost Ana real money when missed; a win-back message sent a day late loses almost nothing. Quotas can come later if a studio asks for them.
+> ➡️ (a). Lena sees "only 2 left" at checkout and picks Sunday for the rest, instead of hearing it from Maya on the phone.
 
-A full session lives in [`examples/pilates-studio-session.md`](examples/pilates-studio-session.md). The studio, people and numbers are invented for the demo.
+A full session lives in [`examples/bakery-preorders-session.md`](examples/bakery-preorders-session.md). The bakery, people, code and numbers are all invented for the demo.
 
 ## Prerequisite
 
@@ -107,7 +107,7 @@ Manual, script and `npx skills` installs invoke as plain `/grill-with-stories`.
 | Input | Example |
 |---|---|
 | Plan file | `/grill-with-stories docs/plans/reminders.md` |
-| Free text | `/grill-with-stories a waitlist for full reformer classes` |
+| Free text | `/grill-with-stories a waitlist for sold-out pickup days` |
 | Nothing | `/grill-with-stories` after discussing a plan |
 
 `grill-with-stories` is manual-only: it runs when you type it, never on its own. It asks in rounds (every question it can ask right now), waits for your answers, and keeps going until the plan has no open branches.
