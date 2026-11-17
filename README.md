@@ -4,10 +4,15 @@
 
 `make-a-story` is a pair of agent skills for **Claude Code** and **Google Antigravity (`agy`)**. It runs a relentless grilling session on your plan, like Matt Pocock's [`/grill-me`](https://github.com/mattpocock/skills), but every question arrives with a short story told from your **user's** point of view: named recurring characters, concrete numbers, the moment the decision actually bites. You stop answering abstract trade-offs and start answering "what happens to Ana on Monday morning?".
 
+It also works on its own: point `/make-a-story` at an issue, a spec or the current conversation and you get one story, before → after, told by the same kind of named cast, plus the open questions the story exposed. Read it, share it, or hand those questions straight to `/grill-with-stories`.
+
 ```
 /grill-with-stories docs/plans/reminder-sequences.md
 /grill-with-stories we're adding same-day pickup slots to the bakery app
 /grill-with-stories                 # uses the current conversation as the plan
+
+/make-a-story #142                  # one before → after story for an issue
+/make-a-story docs/spec.md --out    # same, and saves it to .make-a-story/
 ```
 
 ## What a question looks like
@@ -56,7 +61,7 @@ claude plugin marketplace add victor-lis-bronzo/make-a-story-skill
 claude plugin install make-a-story@make-a-story-skill
 ```
 
-Plugin skills are namespaced: invoke as `/make-a-story:grill-with-stories`.
+Plugin skills are namespaced: invoke as `/make-a-story:grill-with-stories` and `/make-a-story:make-a-story`.
 
 ### 3. Antigravity plugin
 
@@ -100,9 +105,11 @@ Copy both `skills/grill-with-stories/` and `skills/make-a-story/` to:
 | Global | `~/.claude/skills/grill-with-stories`, `~/.claude/skills/make-a-story` | `~/.gemini/config/skills/grill-with-stories`, `~/.gemini/config/skills/make-a-story` |
 | Project | `.claude/skills/grill-with-stories`, `.claude/skills/make-a-story` | `.agents/skills/grill-with-stories`, `.agents/skills/make-a-story` |
 
-Manual, script and `npx skills` installs invoke as plain `/grill-with-stories`.
+Manual, script and `npx skills` installs invoke as plain `/grill-with-stories` and `/make-a-story`.
 
 ## Usage
+
+### With grill
 
 | Input | Example |
 |---|---|
@@ -119,7 +126,43 @@ Manual, script and `npx skills` installs invoke as plain `/grill-with-stories`.
 
 Output language follows the conversation: grill in Portuguese and the stories, characters and options come back in Portuguese.
 
+### Standalone
+
+`/make-a-story` with an input tells **one** story about it instead of asking questions.
+
+| Input | Example |
+|---|---|
+| GitHub issue or PR (via `gh`) | `/make-a-story #142` |
+| GitHub URL | `/make-a-story https://github.com/acme/bakery/issues/142` |
+| Jira key (via your Jira MCP) | `/make-a-story BAKE-142` |
+| File, saved to disk | `/make-a-story docs/spec.md --out` |
+| Free text | `/make-a-story customers can split an order when a day sells out` |
+| Nothing | `/make-a-story` after discussing a change |
+
+You get one narrative, before → after: 📖 **Today** (the friction as people live it), 📖 **After** (the same people once the change ships, including the moment each acceptance criterion shows up), 🔧 technical context when there is real code to point at, and ❓ the open questions the story exposed. It ends by offering to grill those questions with `/grill-with-stories`, keeping the same cast.
+
+It only reads: it never comments on or edits the issue, PR or ticket. `--out [dir]` also writes the story to `<dir>/<slug>.md` (default `.make-a-story/`); if you use it, add `.make-a-story/` to your `.gitignore`.
+
+A trimmed example:
+
+> # Allow partial orders when a pickup day sells out - the story
+>
+> 📖 **Today:** It's Friday, 16:20, and Crumb & Co has 118 of its 120 bread slots booked for Saturday. Lena wants 4 sourdoughs and 6 croissants, and checkout answers "Saturday is full" without saying that most of it would still fit. She buys supermarket bread instead. …
+>
+> 📖 **After #142:** Checkout tells Lena "2 of 4 sourdoughs and all 6 croissants fit on Saturday". She taps "split the rest" and the other 2 move to Sunday. …
+>
+> ❓ **Open questions**
+> 1. If Sunday is full too, does the rest move to Monday, or does Lena pick a day herself?
+> 2. Does a split order pay once, or is the Sunday part charged at pickup?
+
+The full output lives in [`skills/make-a-story/references/example-standalone.md`](skills/make-a-story/references/example-standalone.md).
+
 ## How it works
+
+`make-a-story` has two modes:
+
+- **Grill mode**: it formats each question someone else is asking (the ❓/📖/🔧/Options/➡️ shape below). This is what `/grill-with-stories` uses.
+- **Standalone mode**: `/make-a-story <input>` reads an issue, ticket, file, text or the conversation and writes one before → after story with open questions.
 
 `grill-with-stories` = `grilling` + `make-a-story`, the same pattern as Matt's `grill-with-docs` (= `grilling` + `domain-modeling`).
 
